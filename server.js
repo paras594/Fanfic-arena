@@ -15,8 +15,9 @@ app.use(cors());
 
 app.use("/api/users", usersRoutes);
 
-app.get("/", (req, res) => {
-	res.send("server working");
+app.get("/api/test", (req, res) => {
+	console.log(process.env.NAME);
+	res.json({ success: true });
 });
 
 const port = 5000;
