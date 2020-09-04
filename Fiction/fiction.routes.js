@@ -22,6 +22,24 @@ router.get("/:fictionId", fictionController.getOneFiction);
 
 router.get("/", fictionController.getFictions);
 
+router.patch(
+	"/:fictionId/like",
+	passport.authenticate("jwt", {
+		failureRedirect: "/unauthorized",
+		session: false
+	}),
+	fictionController.likeFiction
+);
+
+router.patch(
+	"/:fictionId/unlike",
+	passport.authenticate("jwt", {
+		failureRedirect: "/unauthorized",
+		session: false
+	}),
+	fictionController.unlikeFiction
+);
+
 // router.post("/test", uploadImage.single("selectedFile"), (req, res) => {
 // 	console.log(req.file.filename);
 // 	console.log(req.body);

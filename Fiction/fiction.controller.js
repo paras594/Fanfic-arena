@@ -131,8 +131,18 @@ function getOneFiction(req, res) {
 
 function getFictionByCategory(req, res) {
 	const { category } = req.params;
+	let limitQuery = req.query.limit ? parseInt(req.query.limit) : 0;
+	const userFields = {
+		_id: 1,
+		username: 1,
+		fullname: 1,
+		email: 1,
+		userImage: 1
+	};
 
 	Fiction.find({ category })
+		.limit(limitQuery)
+		.populate("userId", userFields)
 		.then((fictions) => {
 			res.status(200).json({
 				message: `${category} related fictions`,
@@ -199,10 +209,48 @@ async function getSearchResults(req, res) {
 	}
 }
 
+function likeFiction(req, res) {
+	// req.user { username, _id }
+	// req.params { fictionId }
+	const { fictionId } = req.params;
+	const userId = req.user._id;
+
+	Fiction.findOneAndUpdate(
+		{ _id: fictionId },
+		{
+			$push: { likes: userId },
+			$inc: { likesCount: 1 }
+		},
+		{ new: true }
+	).then((fiction) => {
+		return res.json(fiction);
+	});
+}
+
+function unlikeFiction(req, res) {
+	// req.user { username, _id }
+	// req.params { fictionId }
+	const { fictionId } = req.params;
+	const userId = req.user._id;
+
+	Fiction.findOneAndUpdate(
+		{ _id: fictionId },
+		{
+			$pull: { likes: userId },
+			$inc: { likesCount: -1 }
+		},
+		{ new: true }
+	).then((fiction) => {
+		return res.json(fiction);
+	});
+}
+
 module.exports = {
 	createFiction,
 	getFictions,
 	getOneFiction,
 	getFictionByCategory,
-	getSearchResults
+	getSearchResults,
+	likeFiction,
+	unlikeFiction
 };
