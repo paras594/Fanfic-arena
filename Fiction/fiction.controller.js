@@ -1,8 +1,10 @@
 const fs = require("fs");
 const User = require("../User/user.schema.js");
 const Fiction = require("./fiction.schema.js");
+const FictionComment = require("./fictionComment.schema.js");
 const validate = require("./validators.js");
 const sanitize = require("./sanitizers.js");
+const mongoose = require("mongoose");
 
 function createFiction(req, res) {
 	// req.body { title, description, category, body }
@@ -112,7 +114,13 @@ function getOneFiction(req, res) {
 
 	Fiction.findOne({ _id: fictionId })
 		.populate("userId", userFields)
-		.populate("comments")
+		.populate({
+			path: "comments",
+			populate: {
+				path: "userId",
+				select: userFields
+			}
+		})
 		.then((fiction) => {
 			res.status(200).json({
 				message: "Fiction data",
@@ -245,6 +253,121 @@ function unlikeFiction(req, res) {
 	});
 }
 
+function addComment(req, res) {
+	// req.body = { comment }
+	// req.params = { fictionId }
+	// req.user = {_id, username}
+
+	const sanitizedData = sanitize.commentInput(req.body);
+	const { isValid, errors } = validate.commentInput(sanitizedData);
+
+	if (!isValid) {
+		return res.status(400).json({
+			message: "Validation errors",
+			inputs: sanitizedData,
+			errors
+		});
+	}
+
+	const body = sanitizedData.comment;
+	const userId = req.user._id;
+	const { fictionId } = req.params;
+
+	const newComment = new FictionComment({
+		userId,
+		fictionId,
+		body
+	});
+
+	newComment.save().then((ficCom) => {
+		Fiction.findOneAndUpdate(
+			{ _id: fictionId },
+			{
+				$push: { comments: newComment._id },
+				$inc: { commentsCount: 1 }
+			},
+			{ new: true }
+		).then((fic) => {
+			FictionComment.populate(newComment, {
+				path: "userId",
+				select: "_id username fullname email"
+			}).then((comment) => {
+				res.status(201).json({
+					message: "Comment added",
+					comment
+				});
+			});
+		});
+	});
+}
+
+function saveFiction(req, res) {
+	// req.params = { fictionId }
+	// req.user = {_id, username}
+	const { fictionId } = req.params;
+	const userId = req.user._id;
+
+	User.findOneAndUpdate(
+		{ _id: userId },
+		{
+			$push: { savedFictions: fictionId }
+		},
+		{ new: true }
+	)
+		.then((newFic) => {
+			res.json({
+				message: "Saved fiction"
+			});
+		})
+		.catch((err) => {
+			res.json({
+				message: "Error occured. Failed to save",
+				errors: {
+					error: err
+				}
+			});
+		});
+}
+
+function deleteFiction(req, res) {
+	// req.user { username, _id }
+	// req.params { fictionId }
+
+	const { fictionId } = req.params;
+	const userId = req.user._id;
+
+	Fiction.findOneAndDelete({ _id: fictionId })
+		.then((fic) => {
+			User.findOneAndUpdate(
+				{ _id: userId },
+				{
+					$pull: { fictions: fictionId }
+				}
+			)
+				.then(() => {
+					res.status(200).json({
+						message: "Fiction Deleted Successfully"
+					});
+				})
+				.catch((err) => {
+					res.status(500).json({
+						message: "Error occurred. Failed to delete fiction.",
+						errors: {
+							error: err
+						}
+					});
+				});
+		})
+		.catch((err) => {
+			res.status(500).json({
+				message: "Error occurred. Failed to delete fiction.",
+				errors: {
+					error: err
+				}
+			});
+		});
+}
+
 module.exports = {
 	createFiction,
 	getFictions,
@@ -252,5 +375,8 @@ module.exports = {
 	getFictionByCategory,
 	getSearchResults,
 	likeFiction,
-	unlikeFiction
+	unlikeFiction,
+	addComment,
+	saveFiction,
+	deleteFiction
 };

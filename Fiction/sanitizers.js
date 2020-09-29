@@ -19,8 +19,16 @@ const searchQuery = (data) => {
 	return query;
 };
 
+const commentInput = (data) => {
+	// data = { comment }
+	data.comment = Validator.trim(data.comment);
+
+	return data;
+};
+
 // sanitizers
 module.exports = {
 	fictionInput,
-	searchQuery
+	searchQuery,
+	commentInput
 };

@@ -5,6 +5,8 @@ const uploadImage = require("../utils/uploadImage.js");
 
 const passport = require("passport");
 
+// route: /api/users/
+
 router.post("/register", userController.registerUser);
 router.post("/login", userController.loginUser);
 // router.get(
@@ -13,6 +15,15 @@ router.post("/login", userController.loginUser);
 // 		scope: ["profile", "email"]
 // 	})
 // );
+
+router.get(
+	"/:userId/savedFictions",
+	passport.authenticate("jwt", {
+		failureRedirect: "/unauthorized",
+		session: false
+	}),
+	userController.getSavedFictions
+);
 router.get("/:userId", userController.getUser);
 router.patch(
 	"/profile",

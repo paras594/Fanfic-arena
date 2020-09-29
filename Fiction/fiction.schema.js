@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const mongooseFuzzySearching = require("mongoose-fuzzy-searching");
-const Comment = require("../Comment/comment.schema.js");
+const FictionComment = require("./fictionComment.schema.js");
 
 const FictionSchema = new Schema({
 	userId: {
@@ -50,7 +50,7 @@ const FictionSchema = new Schema({
 	comments: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Comment"
+			ref: "FictionComment"
 		}
 	]
 });

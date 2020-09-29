@@ -40,6 +40,33 @@ router.patch(
 	fictionController.unlikeFiction
 );
 
+router.post(
+	"/:fictionId/comment",
+	passport.authenticate("jwt", {
+		failureRedirect: "/unauthorized",
+		session: false
+	}),
+	fictionController.addComment
+);
+
+router.post(
+	"/:fictionId/save",
+	passport.authenticate("jwt", {
+		failureRedirect: "/unauthorized",
+		session: false
+	}),
+	fictionController.saveFiction
+);
+
+router.delete(
+	"/:fictionId",
+	passport.authenticate("jwt", {
+		failureRedirect: "/unauthorized",
+		session: false
+	}),
+	fictionController.deleteFiction
+);
+
 // router.post("/test", uploadImage.single("selectedFile"), (req, res) => {
 // 	console.log(req.file.filename);
 // 	console.log(req.body);

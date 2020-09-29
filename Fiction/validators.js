@@ -55,8 +55,26 @@ const searchQuery = (data) => {
 	};
 };
 
+const commentInput = (data) => {
+	// data = { comment }
+	let errors = {};
+
+	// convert empty fields to an empty string so we can use validator functions
+	data.comment = !isEmpty(data.comment) ? data.comment : "";
+
+	if (Validator.isEmpty(data.comment)) {
+		errors.comment = "Field cannot be empty";
+	}
+
+	return {
+		errors,
+		isValid: isEmpty(errors)
+	};
+};
+
 // validators
 module.exports = {
 	fictionInput,
-	searchQuery
+	searchQuery,
+	commentInput
 };

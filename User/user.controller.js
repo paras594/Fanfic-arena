@@ -264,10 +264,49 @@ function updateUserPassword(req, res) {
 	});
 }
 
+function getSavedFictions(req, res) {
+	const populateSavedFic = parseInt(req.query.populate) ? "savedFictions" : "";
+
+	console.log(req.params.userId, req.user._id);
+
+	if (req.params.userId != req.user._id) {
+		return res.json({
+			unauthorized: true
+		});
+	}
+
+	User.findOne({ _id: req.params.userId }, { savedFictions: 1 })
+		.populate(populateSavedFic)
+		.then((user) => {
+			if (!user) {
+				return res.status(400).json({
+					message: "Bad Request",
+					errors: {
+						error: "User does not exist"
+					}
+				});
+			}
+
+			return res.status(200).json({
+				message: "Saved Fictions",
+				savedFictions: user.savedFictions
+			});
+		})
+		.catch((err) => {
+			return res.status(400).json({
+				message: "Failed to get user",
+				errors: {
+					error: err
+				}
+			});
+		});
+}
+
 module.exports = {
 	registerUser,
 	loginUser,
 	getUser,
 	updateUserProfile,
-	updateUserPassword
+	updateUserPassword,
+	getSavedFictions
 };
