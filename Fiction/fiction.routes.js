@@ -40,6 +40,16 @@ router.patch(
 	fictionController.unlikeFiction
 );
 
+router.patch(
+	"/:fictionId",
+	passport.authenticate("jwt", {
+		failureRedirect: "/unauthorized",
+		session: false
+	}),
+	uploadImage.single("selectedFile"),
+	fictionController.updateFiction
+);
+
 router.post(
 	"/:fictionId/comment",
 	passport.authenticate("jwt", {
@@ -56,6 +66,15 @@ router.post(
 		session: false
 	}),
 	fictionController.saveFiction
+);
+
+router.post(
+	"/:fictionId/unsave",
+	passport.authenticate("jwt", {
+		failureRedirect: "/unauthorized",
+		session: false
+	}),
+	fictionController.unsaveFiction
 );
 
 router.delete(

@@ -302,11 +302,109 @@ function getSavedFictions(req, res) {
 		});
 }
 
+async function followUser(req, res) {
+	// req.user = { username, _id }
+	// req.params = { userId }
+	const follower = req.user._id;
+	const userToFollow = req.params.userId;
+
+	if (follower === req.params.userId) {
+		return res.json({
+			message: "Trying to follow yourself ?!"
+		});
+	}
+
+	try {
+		const user = await User.findOne({ _id: userToFollow, followers: follower });
+		if (user) {
+			return res.json({
+				message: "Already following"
+			});
+		}
+
+		// add to followers of userToFollow
+		await User.findOneAndUpdate(
+			{ _id: userToFollow },
+			{
+				$push: { followers: follower }
+			}
+		);
+
+		// add to following of follower
+		await User.findOneAndUpdate(
+			{ _id: follower },
+			{
+				$push: { following: userToFollow }
+			}
+		);
+
+		res.json({
+			message: "Started following"
+		});
+	} catch (err) {
+		res.json({
+			error: err
+		});
+	}
+}
+
+async function unfollowUser(req, res) {
+	// loggedIn user is current user
+	// req.user = { username, _id }
+	// req.params = { userId }
+
+	const follower = req.user._id;
+	const userToUnfollow = req.params.userId;
+
+	if (follower === req.params.userId) {
+		return res.json({
+			message: "Trying to unfollow yourself ?!"
+		});
+	}
+
+	try {
+		// check if current user is in the followers of the user.
+		const user = await User.findOne({ _id: userToUnfollow, followers: follower });
+		// if not in followers, that means not following
+		if (!user) {
+			return res.json({
+				message: "Already not following"
+			});
+		}
+
+		// remove current user from followers of user
+		await User.findOneAndUpdate(
+			{ _id: userToUnfollow },
+			{
+				$pull: { followers: follower }
+			}
+		);
+
+		// remove user from following of current user
+		await User.findOneAndUpdate(
+			{ _id: follower },
+			{
+				$pull: { following: userToUnfollow }
+			}
+		);
+
+		res.status(200).json({
+			message: "Unfollowed the user"
+		});
+	} catch (err) {
+		res.json({
+			error: err
+		});
+	}
+}
+
 module.exports = {
 	registerUser,
 	loginUser,
 	getUser,
 	updateUserProfile,
 	updateUserPassword,
-	getSavedFictions
+	getSavedFictions,
+	followUser,
+	unfollowUser
 };

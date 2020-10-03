@@ -24,6 +24,7 @@ router.get(
 	}),
 	userController.getSavedFictions
 );
+
 router.get("/:userId", userController.getUser);
 router.patch(
 	"/profile",
@@ -42,6 +43,24 @@ router.patch(
 		session: false
 	}),
 	userController.updateUserPassword
+);
+
+router.post(
+	"/:userId/follow",
+	passport.authenticate("jwt", {
+		failureRedirect: "/unauthorized",
+		session: false
+	}),
+	userController.followUser
+);
+
+router.post(
+	"/:userId/unfollow",
+	passport.authenticate("jwt", {
+		failureRedirect: "/unauthorized",
+		session: false
+	}),
+	userController.unfollowUser
 );
 
 module.exports = router;

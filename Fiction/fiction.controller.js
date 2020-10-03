@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const User = require("../User/user.schema.js");
 const Fiction = require("./fiction.schema.js");
 const FictionComment = require("./fictionComment.schema.js");
@@ -315,13 +316,44 @@ function saveFiction(req, res) {
 		{ new: true }
 	)
 		.then((newFic) => {
-			res.json({
+			console.log("saved");
+			res.status(200).json({
 				message: "Saved fiction"
 			});
 		})
 		.catch((err) => {
 			res.json({
 				message: "Error occured. Failed to save",
+				errors: {
+					error: err
+				}
+			});
+		});
+}
+
+function unsaveFiction(req, res) {
+	// req.user {username, _id}
+	// req.params { fictionid }
+
+	const { fictionId } = req.params;
+	const userId = req.user._id;
+
+	User.findOneAndUpdate(
+		{ _id: userId },
+		{
+			$pull: { savedFictions: fictionId }
+		},
+		{ new: true }
+	)
+		.then((newFic) => {
+			console.log("unsaved");
+			res.status(200).json({
+				message: "Removed fiction from saved fictions"
+			});
+		})
+		.catch((err) => {
+			res.json({
+				message: "Error occured. Failed to remove from saved fictions",
 				errors: {
 					error: err
 				}
@@ -368,6 +400,69 @@ function deleteFiction(req, res) {
 		});
 }
 
+function updateFiction(req, res) {
+	// req.body { title, description, category, body }
+	// req.file { path, destination, fieldname, mimetype...}
+	// req.user { username, _id }
+	// req.params { fictionId }
+
+	const sanitizedData = sanitize.fictionInput(req.body);
+	const { errors, isValid } = validate.fictionInput(sanitizedData);
+
+	if (!isValid) {
+		// delete file if input is invalid
+		if (req.body.imageChanged && req.file) {
+			fs.unlinkSync(req.file.path);
+		}
+
+		return res.status(400).json({
+			message: "Validation errors",
+			inputs: sanitizedData,
+			errors
+		});
+	}
+
+	const { fictionId } = req.params;
+
+	const updatedFic = {
+		title: sanitizedData.title,
+		description: sanitizedData.description,
+		category: sanitizedData.category,
+		body: sanitizedData.body
+	};
+
+	// this check is required so that previous image is preserved
+	// becoz req.body.imageChanged is a string, it is better to check like this
+	let imageChanged = req.body.imageChanged === "true";
+	let fictionImage;
+
+	if (imageChanged) {
+		console.log("i m here to change image");
+		if (req.file) {
+			fictionImage = "/uploads/" + req.file.filename;
+		} else {
+			fictionImage = "/images/default-fiction-image.svg";
+		}
+
+		updatedFic.image = fictionImage;
+	}
+
+	Fiction.findOneAndUpdate({ _id: fictionId }, updatedFic)
+		.then(() => {
+			res.status(200).json({
+				message: "Fiction updated"
+			});
+		})
+		.catch((err) => {
+			res.status(400).json({
+				message: "Failed to update fiction",
+				errors: {
+					error: err
+				}
+			});
+		});
+}
+
 module.exports = {
 	createFiction,
 	getFictions,
@@ -378,5 +473,7 @@ module.exports = {
 	unlikeFiction,
 	addComment,
 	saveFiction,
-	deleteFiction
+	unsaveFiction,
+	deleteFiction,
+	updateFiction
 };
