@@ -1,9 +1,13 @@
 const fs = require("fs");
 const User = require("./user.schema.js");
+const ResetQuery = require("./resetQueries.schema.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const transporter = require("../config/mailTransporter.js");
+const { v4: uuid } = require("uuid");
 const validate = require("./validators.js");
 const sanitize = require("./sanitizers.js");
+const moment = require("moment");
 
 function registerUser(req, res) {
 	const sanitizedData = sanitize.registerInput(req.body);
@@ -96,7 +100,8 @@ function loginUser(req, res) {
 				username: user.username,
 				email: user.email,
 				fullname: user.fullname,
-				joinedAt: user.joinedAt
+				joinedAt: user.joinedAt,
+				userImage: user.userImage
 			};
 
 			jwt.sign(
@@ -114,6 +119,133 @@ function loginUser(req, res) {
 			);
 		});
 	});
+}
+
+async function forgotPassword(req, res) {
+	const { email } = req.body;
+	console.log(email);
+
+	try {
+		// check if email exists
+		const user = await User.findOne({ email });
+
+		if (!user) {
+			return res.status(400).json({
+				message: "Request failed.",
+				errors: {
+					error: "Email not found."
+				}
+			});
+		}
+
+		// create reset id and request
+		const uniqueId = uuid();
+
+		// save the request in database
+		const request = new ResetQuery({
+			id: uniqueId,
+			email
+		});
+
+		await request.save();
+
+		// send mail
+		const info = await transporter.sendMail({
+			from: "Fanfic Arena",
+			to: email,
+			subject: "Reset Your Fanfic Arena Password",
+			text: `To reset your password, click on the following link: http://localhost:3000/reset/${uniqueId}`
+		});
+
+		console.log(info.response);
+
+		return res.status(200).json({
+			message: "Email sent to " + email
+		});
+	} catch (err) {
+		res.status(400).json({
+			message: "Request failed.",
+			errors: {
+				error: err
+			}
+		});
+	}
+}
+
+async function resetPassword(req, res) {
+	// req.body = {resetId, password, password2}
+	const { errors, isValid } = validate.resetPassInput(req.body);
+
+	if (!isValid) {
+		return res.status(400).json({
+			message: "Validation errors",
+			inputs: req.body,
+			errors
+		});
+	}
+
+	try {
+		// check if request exists
+		const resetRequest = await ResetQuery.findOne({ id: req.body.resetId });
+
+		if (!resetRequest) {
+			return res.status(400).json({
+				message: "Request failed.",
+				errors: {
+					error: "Reset query not found."
+				}
+			});
+		}
+
+		// check for expiry of reset query
+		const expiryDate = moment(resetRequest.date).add(1, "days");
+		const isValid = moment().isBefore(expiryDate);
+
+		if (!isValid) {
+			// delete the query
+			await ResetQuery.findOneAndDelete({ id: req.body.resetId });
+
+			return res.status(400).json({
+				message: "Reset Request Timeout.",
+				errors: {
+					error: "Your reset password period has expired. Make a new reset password request."
+				}
+			});
+		}
+
+		// reset password
+		const user = await User.findOne({ email: resetRequest.email });
+
+		// hash password and update it in db
+		bcrypt.genSalt(10, (err, salt) => {
+			bcrypt.hash(req.body.password, salt, async (err, hash) => {
+				if (err) {
+					return res.status(400).json({
+						success: false,
+						message: "Some error occured.",
+						errors: {
+							error: err
+						}
+					});
+				}
+
+				const hashedPassword = hash;
+
+				await User.findOneAndUpdate({ _id: user._id }, { password: hashedPassword });
+
+				return res.status(200).json({
+					message: "Password updated."
+				});
+			});
+		});
+	} catch (err) {
+		res.json({
+			message: "Request failed.",
+			errors: {
+				error: err
+			}
+		});
+	}
 }
 
 function getUser(req, res) {
@@ -398,13 +530,51 @@ async function unfollowUser(req, res) {
 	}
 }
 
+function getConnections(req, res) {
+	// req.user = { username, _id }
+	// req.params = { userId }
+	const { userId } = req.params;
+
+	const includeFields = {
+		username: 1,
+		email: 1,
+		fullname: 1,
+		joinedAt: 1,
+		userImage: 1,
+		following: 1,
+		followers: 1
+	};
+
+	User.findOne({ _id: userId })
+		.select(includeFields)
+		.populate("followers", { username: 1, email: 1, joinedAt: 1, userImage: 1, fullname: 1 })
+		.populate("following", { username: 1, email: 1, joinedAt: 1, userImage: 1, fullname: 1 })
+		.then((user) => {
+			res.status(200).json({
+				message: "User with followers and following data",
+				user
+			});
+		})
+		.catch((err) => {
+			res.status(400).json({
+				message: "Request Failed",
+				errors: {
+					error: err
+				}
+			});
+		});
+}
+
 module.exports = {
 	registerUser,
 	loginUser,
+	forgotPassword,
+	resetPassword,
 	getUser,
 	updateUserProfile,
 	updateUserPassword,
 	getSavedFictions,
 	followUser,
-	unfollowUser
+	unfollowUser,
+	getConnections
 };

@@ -232,7 +232,18 @@ function likeFiction(req, res) {
 		},
 		{ new: true }
 	).then((fiction) => {
-		return res.json(fiction);
+		User.findOneAndUpdate(
+			{ _id: userId },
+			{
+				$push: { likedFictions: fictionId }
+			},
+			{ new: true }
+		).then((user) => {
+			return res.status(200).json({
+				message: "Liked fiction successfully",
+				fiction
+			});
+		});
 	});
 }
 
@@ -250,7 +261,18 @@ function unlikeFiction(req, res) {
 		},
 		{ new: true }
 	).then((fiction) => {
-		return res.json(fiction);
+		User.findOneAndUpdate(
+			{ _id: userId },
+			{
+				$pull: { likedFictions: fictionId }
+			},
+			{ new: true }
+		).then((user) => {
+			return res.status(200).json({
+				message: "Unliked fiction successfully",
+				fiction
+			});
+		});
 	});
 }
 

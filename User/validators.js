@@ -72,6 +72,40 @@ const registerInput = (data) => {
 	};
 };
 
+const resetPassInput = (data) => {
+	// data = { resetId, password, password2 }
+	let errors = {};
+
+	data.resetId = !isEmpty(data.resetId) ? data.resetId : "";
+	data.password = !isEmpty(data.password) ? data.password : "";
+	data.password2 = !isEmpty(data.password2) ? data.password2 : "";
+
+	if (Validator.isEmpty(data.resetId)) {
+		errors.resetId = "Reset ID is not available";
+	}
+
+	if (Validator.isEmpty(data.password)) {
+		errors.password = "Password field is required";
+	}
+
+	if (Validator.isEmpty(data.password2)) {
+		errors.password2 = "Confirm password field is required";
+	}
+
+	if (!Validator.isLength(data.password, { min: 6, max: 30 })) {
+		errors.password = "Password must be at least 6 characters";
+	}
+
+	if (!Validator.equals(data.password, data.password2)) {
+		errors.password2 = "Passwords must match";
+	}
+
+	return {
+		errors,
+		isValid: isEmpty(errors)
+	};
+};
+
 const editProfileInput = (data) => {
 	// data = { username, email, fullname }
 	let errors = {};
@@ -146,6 +180,7 @@ const updatePasswordInput = (data) => {
 module.exports = {
 	loginInput,
 	registerInput,
+	resetPassInput,
 	editProfileInput,
 	updatePasswordInput
 };

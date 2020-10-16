@@ -9,6 +9,10 @@ const passport = require("passport");
 
 router.post("/register", userController.registerUser);
 router.post("/login", userController.loginUser);
+
+router.post("/forgot-password", userController.forgotPassword);
+router.patch("/reset-password", userController.resetPassword);
+
 // router.get(
 // 	"/auth/google",
 // 	passport.authenticate("google", {
@@ -23,6 +27,16 @@ router.get(
 		session: false
 	}),
 	userController.getSavedFictions
+);
+
+// connections means followers/following
+router.get(
+	"/:userId/connections",
+	passport.authenticate("jwt", {
+		failureRedirect: "/unauthorized",
+		session: false
+	}),
+	userController.getConnections
 );
 
 router.get("/:userId", userController.getUser);
