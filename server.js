@@ -40,8 +40,9 @@ app.get("/api/test", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-	console.log({ path: path.join(__dirname, "./client/build/index.html") });
-	res.sendFile(path.resolve(__dirname, "./client/build/index.html"));
+	return res.json({ success: true });
+	// console.log({ path: path.join(__dirname, "./client/build/index.html") });
+	// res.sendFile(path.resolve(__dirname, "./client/build/index.html"));
 });
 
 const port = process.env.PORT || 5000;
