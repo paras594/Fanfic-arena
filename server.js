@@ -30,7 +30,11 @@ app.get("/unauthorized", (req, res) => {
 
 app.get("/api/test", (req, res) => {
 	console.log(process.env.NAME);
-	res.json({ success: true, name: process.env.NAME, dir: __dirname });
+	res.json({
+		success: true,
+		name: process.env.NAME,
+		dir: path.resolve(__dirname),
+	});
 });
 
 // app.use((req, res) => {
