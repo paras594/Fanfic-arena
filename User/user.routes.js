@@ -5,16 +5,21 @@ const uploadImage = require("../utils/uploadImage.js");
 
 const passport = require("passport");
 const User = require("./user.schema.js");
+const mongoose = require("mongoose");
 
 // route: /api/users/
 router.get("/paras", (req, res) => {
-	User.find({})
-		.then((results) => {
-			res.json({ users: results });
-		})
-		.catch((err) => {
-			res.json({ error: err });
-		});
+	res.json({
+		state: mongoose.connection.readyState,
+	});
+
+	// User.find({})
+	// 	.then((results) => {
+	// 		res.json({ users: results });
+	// 	})
+	// 	.catch((err) => {
+	// 		res.json({ error: err });
+	// 	});
 });
 
 router.post("/register", userController.registerUser);
