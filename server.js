@@ -34,6 +34,7 @@ app.get("/api/test", (req, res) => {
 		success: true,
 		name: process.env.NAME,
 		dir: path.resolve(__dirname),
+		test: req.protocol + "://" + req.get("host") + req.originalUrl,
 	});
 });
 
