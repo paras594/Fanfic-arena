@@ -14,7 +14,7 @@ require("./config/db.js");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, "client", "build")));
+// app.use(express.static(path.join(__dirname, "client", "build")));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cors());
@@ -40,17 +40,17 @@ app.get("/api/test", (req, res) => {
 	});
 });
 
-if (process.env.NODE_ENV === "production") {
-	app.get("*", (req, res) => {
-		res.json({
-			success: true,
-			exists: fs.existsSync(
-				path.join(__dirname, "client", "build", "index.html")
-			),
-		});
-		// res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+// if (process.env.NODE_ENV === "production") {
+app.get("*", (req, res) => {
+	res.json({
+		success: true,
+		exists: fs.existsSync(
+			path.join(__dirname, "client", "build", "index.html")
+		),
 	});
-}
+	// res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+});
+// }
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`listening on port: ${port}`));
