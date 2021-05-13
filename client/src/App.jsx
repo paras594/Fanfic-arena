@@ -27,7 +27,7 @@ import { logoutUser, setCurrentUser } from "./redux/actions/authActions.js";
 import axios from "axios";
 import keys from "./keys.js";
 
-// axios.defaults.baseURL = keys.apiEndpoint;
+axios.defaults.baseURL = keys.apiEndpoint;
 
 function App() {
 	const dispatch = useDispatch();
