@@ -23,7 +23,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/fictions", fictionRoutes);
 app.get("/unauthorized", (req, res) => {
 	res.json({
-		unauthorized: true
+		unauthorized: true,
 	});
 });
 
@@ -32,5 +32,5 @@ app.get("/api/test", (req, res) => {
 	res.json({ success: true });
 });
 
-const port = 5000;
+const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`listening on port: ${port}`));
