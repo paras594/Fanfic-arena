@@ -4,59 +4,59 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
 	username: {
 		type: String,
-		required: true
+		required: true,
 	},
 	email: {
 		type: String,
-		required: true
+		required: true,
 	},
 	password: {
 		type: String,
-		required: true
+		required: true,
 	},
 	fullname: {
-		type: String
+		type: String,
 	},
 	userImage: {
 		type: String,
-		default: "/images/default-profile-image.png"
+		default: "/images/default-profile-image.png",
 	},
 	fictions: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Fiction"
-		}
+			ref: "Fiction",
+		},
 	],
 	likedFictions: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Fiction"
-		}
+			ref: "Fiction",
+		},
 	],
 	savedFictions: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Fiction"
-		}
+			ref: "Fiction",
+		},
 	],
 	joinedAt: {
 		type: Date,
-		default: Date.now
+		default: Date.now,
 	},
 	followers: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "User"
-		}
+			ref: "User",
+		},
 	],
 	following: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "User"
-		}
+			ref: "User",
+		},
 	],
-	favouriteCategories: [String]
+	favouriteCategories: [String],
 });
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model("users", userSchema);
 module.exports = User;

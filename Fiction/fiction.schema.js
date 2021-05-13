@@ -7,55 +7,55 @@ const FictionSchema = new Schema({
 	userId: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "User",
-		required: true
+		required: true,
 	},
 	title: {
 		type: String,
-		required: true
+		required: true,
 	},
 	description: {
 		type: String,
-		required: true
+		required: true,
 	},
 	image: {
 		type: String,
-		default: "/images/default-fiction-image.svg"
+		default: "/images/default-fiction-image.svg",
 	},
 	createdAt: {
 		type: Date,
-		default: Date.now
+		default: Date.now,
 	},
 	category: {
 		type: String,
-		required: true
+		required: true,
 	},
 	body: {
 		type: String,
-		required: true
+		required: true,
 	},
 	likesCount: {
 		type: Number,
-		default: 0
+		default: 0,
 	},
 	likes: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "User"
-		}
+			ref: "User",
+		},
 	],
 	commentsCount: {
 		type: Number,
-		default: 0
+		default: 0,
 	},
 	comments: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "FictionComment"
-		}
-	]
+			ref: "FictionComment",
+		},
+	],
 });
 
 FictionSchema.plugin(mongooseFuzzySearching, { fields: ["title"] });
 
-const Fiction = mongoose.model("Fiction", FictionSchema);
+const Fiction = mongoose.model("fictions", FictionSchema);
 module.exports = Fiction;

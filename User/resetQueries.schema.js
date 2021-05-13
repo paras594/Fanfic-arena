@@ -4,14 +4,14 @@ const Schema = mongoose.Schema;
 const ResetQuerySchema = new Schema({
 	id: {
 		type: String,
-		required: true
+		required: true,
 	},
 	email: {
 		type: String,
-		required: true
+		required: true,
 	},
-	date: { type: Date, default: Date.now }
+	date: { type: Date, default: Date.now },
 });
 
-const ResetQuery = mongoose.model("ResetQuery", ResetQuerySchema);
+const ResetQuery = mongoose.model("resetqueries", ResetQuerySchema);
 module.exports = ResetQuery;
