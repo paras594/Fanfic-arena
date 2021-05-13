@@ -29,7 +29,7 @@ app.get("/unauthorized", (req, res) => {
 
 app.get("/api/test", (req, res) => {
 	console.log(process.env.NAME);
-	res.json({ success: true });
+	res.json({ success: true, name: process.env.NAME });
 });
 
 const port = process.env.PORT || 5000;
