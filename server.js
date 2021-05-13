@@ -1,4 +1,5 @@
 require("dotenv").config();
+const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
@@ -41,8 +42,13 @@ app.get("/api/test", (req, res) => {
 
 if (process.env.NODE_ENV === "production") {
 	app.get("*", (req, res) => {
-		// res.json({ success: true });
-		res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+		res.json({
+			success: true,
+			exists: fs.existsSync(
+				path.join(__dirname, "client", "build", "index.html")
+			),
+		});
+		// res.sendFile(path.join(__dirname, "client", "build", "index.html"));
 	});
 }
 
