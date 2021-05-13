@@ -13,7 +13,7 @@ require("./config/db.js");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static("public", "./public"));
+app.use(express.static("public", path.join(__dirname, "public")));
 
 app.use(cors());
 
@@ -38,9 +38,8 @@ app.get("/api/test", (req, res) => {
 	});
 });
 
-app.get("*", (req, res) => {
-	app.use(express.static(path.join(__dirname, "/client/build/")));
-
+app.use(express.static(path.join(__dirname, "/client/build/")));
+app.get("/", (req, res) => {
 	// console.log({ path: path.join(__dirname, "./client/build/index.html") });
 	res.sendFile(path.join(__dirname, "client", "build", "index.html"));
 });
