@@ -6,6 +6,9 @@ const uploadImage = require("../utils/uploadImage.js");
 const passport = require("passport");
 
 // route: /api/users/
+router.get("/paras", (req, res) => {
+	res.json({ paras: "here" });
+});
 
 router.post("/register", userController.registerUser);
 router.post("/login", userController.loginUser);
@@ -24,7 +27,7 @@ router.get(
 	"/:userId/savedFictions",
 	passport.authenticate("jwt", {
 		failureRedirect: "/unauthorized",
-		session: false
+		session: false,
 	}),
 	userController.getSavedFictions
 );
@@ -34,7 +37,7 @@ router.get(
 	"/:userId/connections",
 	passport.authenticate("jwt", {
 		failureRedirect: "/unauthorized",
-		session: false
+		session: false,
 	}),
 	userController.getConnections
 );
@@ -44,7 +47,7 @@ router.patch(
 	"/profile",
 	passport.authenticate("jwt", {
 		failureRedirect: "/unauthorized",
-		session: false
+		session: false,
 	}),
 	uploadImage.single("selectedFile"),
 	userController.updateUserProfile
@@ -54,7 +57,7 @@ router.patch(
 	"/password",
 	passport.authenticate("jwt", {
 		failureRedirect: "/unauthorized",
-		session: false
+		session: false,
 	}),
 	userController.updateUserPassword
 );
@@ -63,7 +66,7 @@ router.post(
 	"/:userId/follow",
 	passport.authenticate("jwt", {
 		failureRedirect: "/unauthorized",
-		session: false
+		session: false,
 	}),
 	userController.followUser
 );
@@ -72,7 +75,7 @@ router.post(
 	"/:userId/unfollow",
 	passport.authenticate("jwt", {
 		failureRedirect: "/unauthorized",
-		session: false
+		session: false,
 	}),
 	userController.unfollowUser
 );
