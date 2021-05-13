@@ -1,4 +1,5 @@
 require("dotenv").config();
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const passport = require("passport");
@@ -29,8 +30,13 @@ app.get("/unauthorized", (req, res) => {
 
 app.get("/api/test", (req, res) => {
 	console.log(process.env.NAME);
-	res.json({ success: true, name: process.env.NAME });
+	res.json({ success: true, name: process.env.NAME, dir: __dirname });
 });
+
+// app.use((req, res) => {
+// 	app.use(express.static(path.join(__dirname, "../client/build/")));
+// 	res.sendFile(path.join(__dirname, "../client/build/index.html"));
+// });
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`listening on port: ${port}`));
