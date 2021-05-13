@@ -4,10 +4,17 @@ const userController = require("./user.controller.js");
 const uploadImage = require("../utils/uploadImage.js");
 
 const passport = require("passport");
+const User = require("./user.schema.js");
 
 // route: /api/users/
 router.get("/paras", (req, res) => {
-	res.json({ paras: "here" });
+	User.find({})
+		.then((results) => {
+			res.json({ users: results });
+		})
+		.catch((err) => {
+			res.json({ error: err });
+		});
 });
 
 router.post("/register", userController.registerUser);

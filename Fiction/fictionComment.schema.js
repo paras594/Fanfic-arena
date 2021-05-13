@@ -5,22 +5,22 @@ const FictionCommentSchema = new Schema({
 	userId: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "User",
-		required: true
+		required: true,
 	},
 	fictionId: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Fiction",
-		required: true
+		required: true,
 	},
 	body: {
 		type: String,
-		required: true
+		required: true,
 	},
 	createdAt: {
 		type: Date,
-		default: Date.now
-	}
+		default: Date.now,
+	},
 });
 
-const FictionComment = mongoose.model("FictionComment", FictionCommentSchema);
+const FictionComment = mongoose.model("fictioncomments", FictionCommentSchema);
 module.exports = FictionComment;
