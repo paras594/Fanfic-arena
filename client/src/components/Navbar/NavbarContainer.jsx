@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useHistory } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { GoThreeBars } from "react-icons/go";
 import {
 	Nav,
@@ -17,11 +18,13 @@ import {
 
 import Search from "../Search/Search.js";
 import LogoContainer from "../Logo/LogoContainer.jsx";
+import { logoutUser } from "../../redux/actions/authActions.js";
 
 function NavbarContainer({ isAuth, user }) {
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 	const history = useHistory();
+	const dispatch = useDispatch();
 
 	const handleToggle = (e) => {
 		setMenuOpen(!menuOpen);
@@ -37,6 +40,11 @@ function NavbarContainer({ isAuth, user }) {
 
 	const handleWriteFiction = () => {
 		history.push("/create-fiction");
+	};
+
+	const handleLogout = () => {
+		dispatch(logoutUser());
+		history.push("/login");
 	};
 
 	const toggleProfileMenu = () => setIsProfileMenuOpen(!isProfileMenuOpen);
@@ -73,7 +81,7 @@ function NavbarContainer({ isAuth, user }) {
 								<NavProfileImg src={user.userImage} alt="profile pic" />
 								<NavProfileMenu open={isProfileMenuOpen}>
 									<Link to={`/profile/${user.id}`}>Profile</Link>
-									<p onClick={() => console.log("clicked")}>Logout</p>
+									<p onClick={handleLogout}>Logout</p>
 								</NavProfileMenu>
 							</NavProfileBtn>
 						</>
