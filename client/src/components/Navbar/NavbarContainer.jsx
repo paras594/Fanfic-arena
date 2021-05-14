@@ -58,7 +58,7 @@ function NavbarContainer({ isAuth, user }) {
 				<NavToggleMenu open={menuOpen} big={isAuth}>
 					<Link to={isAuth ? "/home" : "/"}>Home</Link>
 					<Link to="/categories">Categories</Link>
-					{isAuth && <Link to={`/profile/${user.id}`}>My Fictions</Link>}
+					{isAuth && <Link to={`/profile/${user._id}`}>My Fictions</Link>}
 					<NavButton onClick={handleLoginClick}>Login</NavButton>
 					<NavButton onClick={handleRegisterClick}>Register</NavButton>
 				</NavToggleMenu>
@@ -66,7 +66,7 @@ function NavbarContainer({ isAuth, user }) {
 				<NavLinks>
 					<Link to={isAuth ? "/home" : "/"}>Home</Link>
 					<Link to="/categories">Categories</Link>
-					{isAuth && <Link to={`/profile/${user.id}`}>My Fictions</Link>}
+					{isAuth && <Link to={`/profile/${user._id}`}>My Fictions</Link>}
 				</NavLinks>
 				<NavSearch>
 					<Search />
@@ -80,7 +80,7 @@ function NavbarContainer({ isAuth, user }) {
 							<NavProfileBtn onClick={toggleProfileMenu}>
 								<NavProfileImg src={user.userImage} alt="profile pic" />
 								<NavProfileMenu open={isProfileMenuOpen}>
-									<Link to={`/profile/${user.id}`}>Profile</Link>
+									<Link to={`/profile/${user._id}`}>Profile</Link>
 									<p onClick={handleLogout}>Logout</p>
 								</NavProfileMenu>
 							</NavProfileBtn>
