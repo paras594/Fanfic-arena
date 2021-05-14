@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "client", "build")));
 app.use(express.static(path.join(__dirname, "public")));
 
-// app.use(cors());
+app.use(cors());
 
 app.use(passport.initialize());
 require("./config/passport.config.js")(passport);
@@ -41,7 +41,7 @@ app.get("/api/test", (req, res) => {
 });
 
 if (process.env.NODE_ENV === "production") {
-	app.get("/", (req, res) => {
+	app.get("*", (req, res) => {
 		res.sendFile(path.join(__dirname, "client", "build", "index.html"));
 	});
 }

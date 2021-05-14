@@ -18,7 +18,7 @@ function registerUser(req, res) {
 		return res.status(400).json({
 			message: "Validation errors",
 			inputs: sanitizedData,
-			errors
+			errors,
 		});
 	}
 
@@ -28,15 +28,15 @@ function registerUser(req, res) {
 				message: "Email already exists",
 				errors: {
 					email: "Email already exists",
-					inputs: sanitizedData
-				}
+					inputs: sanitizedData,
+				},
 			});
 		}
 
 		const newUser = new User({
 			username: sanitizedData.username,
 			email: sanitizedData.email,
-			password: sanitizedData.password
+			password: sanitizedData.password,
 		});
 
 		bcrypt.genSalt(10, (err, salt) => {
@@ -47,15 +47,15 @@ function registerUser(req, res) {
 					.save()
 					.then(() => {
 						res.status(201).json({
-							message: "User registered"
+							message: "User registered",
 						});
 					})
 					.catch((err) => {
 						res.status(500).json({
 							message: "Server error occured.",
 							errors: {
-								error: err
-							}
+								error: err,
+							},
 						});
 					});
 			});
@@ -71,7 +71,7 @@ function loginUser(req, res) {
 		return res.status(400).json({
 			message: "Validation errors",
 			inputs: sanitizedData,
-			errors
+			errors,
 		});
 	}
 
@@ -80,8 +80,8 @@ function loginUser(req, res) {
 			return res.status(404).json({
 				message: "User not found",
 				errors: {
-					error: "User not found"
-				}
+					error: "User not found",
+				},
 			});
 		}
 
@@ -90,8 +90,8 @@ function loginUser(req, res) {
 				return res.status(400).json({
 					message: "Login failed",
 					errors: {
-						error: "Login failed"
-					}
+						error: "Login failed",
+					},
 				});
 			}
 
@@ -101,19 +101,19 @@ function loginUser(req, res) {
 				email: user.email,
 				fullname: user.fullname,
 				joinedAt: user.joinedAt,
-				userImage: user.userImage
+				userImage: user.userImage,
 			};
 
 			jwt.sign(
 				payload,
 				"secret",
 				{
-					expiresIn: 31556926
+					expiresIn: 31556926,
 				},
 				(err, token) => {
 					res.json({
 						message: "Login successful",
-						token: `Bearer ${token}`
+						token: `Bearer ${token}`,
 					});
 				}
 			);
@@ -133,8 +133,8 @@ async function forgotPassword(req, res) {
 			return res.status(400).json({
 				message: "Request failed.",
 				errors: {
-					error: "Email not found."
-				}
+					error: "Email not found.",
+				},
 			});
 		}
 
@@ -144,7 +144,7 @@ async function forgotPassword(req, res) {
 		// save the request in database
 		const request = new ResetQuery({
 			id: uniqueId,
-			email
+			email,
 		});
 
 		await request.save();
@@ -154,20 +154,20 @@ async function forgotPassword(req, res) {
 			from: "Fanfic Arena",
 			to: email,
 			subject: "Reset Your Fanfic Arena Password",
-			text: `To reset your password, click on the following link: http://localhost:3000/reset/${uniqueId}`
+			text: `To reset your password, click on the following link: http://localhost:3000/reset/${uniqueId}`,
 		});
 
 		console.log(info.response);
 
 		return res.status(200).json({
-			message: "Email sent to " + email
+			message: "Email sent to " + email,
 		});
 	} catch (err) {
 		res.status(400).json({
 			message: "Request failed.",
 			errors: {
-				error: err
-			}
+				error: err,
+			},
 		});
 	}
 }
@@ -180,7 +180,7 @@ async function resetPassword(req, res) {
 		return res.status(400).json({
 			message: "Validation errors",
 			inputs: req.body,
-			errors
+			errors,
 		});
 	}
 
@@ -192,8 +192,8 @@ async function resetPassword(req, res) {
 			return res.status(400).json({
 				message: "Request failed.",
 				errors: {
-					error: "Reset query not found."
-				}
+					error: "Reset query not found.",
+				},
 			});
 		}
 
@@ -208,8 +208,8 @@ async function resetPassword(req, res) {
 			return res.status(400).json({
 				message: "Reset Request Timeout.",
 				errors: {
-					error: "Your reset password period has expired. Make a new reset password request."
-				}
+					error: "Your reset password period has expired. Make a new reset password request.",
+				},
 			});
 		}
 
@@ -224,17 +224,20 @@ async function resetPassword(req, res) {
 						success: false,
 						message: "Some error occured.",
 						errors: {
-							error: err
-						}
+							error: err,
+						},
 					});
 				}
 
 				const hashedPassword = hash;
 
-				await User.findOneAndUpdate({ _id: user._id }, { password: hashedPassword });
+				await User.findOneAndUpdate(
+					{ _id: user._id },
+					{ password: hashedPassword }
+				);
 
 				return res.status(200).json({
-					message: "Password updated."
+					message: "Password updated.",
 				});
 			});
 		});
@@ -242,8 +245,8 @@ async function resetPassword(req, res) {
 		res.json({
 			message: "Request failed.",
 			errors: {
-				error: err
-			}
+				error: err,
+			},
 		});
 	}
 }
@@ -256,26 +259,27 @@ function getUser(req, res) {
 		.populate("followers")
 		.populate("following")
 		.then((user) => {
+			console.log({ user });
 			if (!user) {
 				return res.status(400).json({
 					message: "Bad Request",
 					errors: {
-						error: "User does not exist"
-					}
+						error: "User does not exist",
+					},
 				});
 			}
 
 			return res.status(200).json({
 				message: "User data",
-				user
+				user,
 			});
 		})
 		.catch((err) => {
 			return res.status(400).json({
 				message: "Failed to get user",
 				errors: {
-					error: err
-				}
+					error: err,
+				},
 			});
 		});
 }
@@ -296,7 +300,7 @@ function updateUserProfile(req, res) {
 		return res.status(400).json({
 			message: "Validation errors",
 			inputs: sanitizedData,
-			errors
+			errors,
 		});
 	}
 
@@ -318,15 +322,15 @@ function updateUserProfile(req, res) {
 		.then((user) => {
 			res.status(200).json({
 				message: "User updated",
-				user
+				user,
 			});
 		})
 		.catch((err) => {
 			res.status(400).json({
 				message: "Failed to update user",
 				errors: {
-					error: err
-				}
+					error: err,
+				},
 			});
 		});
 }
@@ -340,7 +344,7 @@ function updateUserPassword(req, res) {
 		return res.status(400).json({
 			message: "Validation errors",
 			inputs: req.body,
-			errors
+			errors,
 		});
 	}
 
@@ -360,8 +364,8 @@ function updateUserPassword(req, res) {
 				return res.status(400).json({
 					message: "Wrong Password",
 					errors: {
-						currentPassword: "Password didn't match"
-					}
+						currentPassword: "Password didn't match",
+					},
 				});
 			}
 
@@ -371,23 +375,23 @@ function updateUserPassword(req, res) {
 						return res.status(500).json({
 							message: "Server error occured",
 							errors: {
-								error: "Server error occured. Try again later."
-							}
+								error: "Server error occured. Try again later.",
+							},
 						});
 					}
 
 					User.findOneAndUpdate({ _id: user._id }, { password: hash })
 						.then(() => {
 							return res.status(200).json({
-								message: "Password updated"
+								message: "Password updated",
 							});
 						})
 						.catch((err) => {
 							return res.status(400).json({
 								message: "Failed to update password",
 								errors: {
-									error: err
-								}
+									error: err,
+								},
 							});
 						});
 				});
@@ -403,7 +407,7 @@ function getSavedFictions(req, res) {
 
 	if (req.params.userId != req.user._id) {
 		return res.json({
-			unauthorized: true
+			unauthorized: true,
 		});
 	}
 
@@ -414,22 +418,22 @@ function getSavedFictions(req, res) {
 				return res.status(400).json({
 					message: "Bad Request",
 					errors: {
-						error: "User does not exist"
-					}
+						error: "User does not exist",
+					},
 				});
 			}
 
 			return res.status(200).json({
 				message: "Saved Fictions",
-				savedFictions: user.savedFictions
+				savedFictions: user.savedFictions,
 			});
 		})
 		.catch((err) => {
 			return res.status(400).json({
 				message: "Failed to get user",
 				errors: {
-					error: err
-				}
+					error: err,
+				},
 			});
 		});
 }
@@ -442,15 +446,18 @@ async function followUser(req, res) {
 
 	if (follower === req.params.userId) {
 		return res.json({
-			message: "Trying to follow yourself ?!"
+			message: "Trying to follow yourself ?!",
 		});
 	}
 
 	try {
-		const user = await User.findOne({ _id: userToFollow, followers: follower });
+		const user = await User.findOne({
+			_id: userToFollow,
+			followers: follower,
+		});
 		if (user) {
 			return res.json({
-				message: "Already following"
+				message: "Already following",
 			});
 		}
 
@@ -458,7 +465,7 @@ async function followUser(req, res) {
 		await User.findOneAndUpdate(
 			{ _id: userToFollow },
 			{
-				$push: { followers: follower }
+				$push: { followers: follower },
 			}
 		);
 
@@ -466,16 +473,16 @@ async function followUser(req, res) {
 		await User.findOneAndUpdate(
 			{ _id: follower },
 			{
-				$push: { following: userToFollow }
+				$push: { following: userToFollow },
 			}
 		);
 
 		res.json({
-			message: "Started following"
+			message: "Started following",
 		});
 	} catch (err) {
 		res.json({
-			error: err
+			error: err,
 		});
 	}
 }
@@ -490,17 +497,20 @@ async function unfollowUser(req, res) {
 
 	if (follower === req.params.userId) {
 		return res.json({
-			message: "Trying to unfollow yourself ?!"
+			message: "Trying to unfollow yourself ?!",
 		});
 	}
 
 	try {
 		// check if current user is in the followers of the user.
-		const user = await User.findOne({ _id: userToUnfollow, followers: follower });
+		const user = await User.findOne({
+			_id: userToUnfollow,
+			followers: follower,
+		});
 		// if not in followers, that means not following
 		if (!user) {
 			return res.json({
-				message: "Already not following"
+				message: "Already not following",
 			});
 		}
 
@@ -508,7 +518,7 @@ async function unfollowUser(req, res) {
 		await User.findOneAndUpdate(
 			{ _id: userToUnfollow },
 			{
-				$pull: { followers: follower }
+				$pull: { followers: follower },
 			}
 		);
 
@@ -516,16 +526,16 @@ async function unfollowUser(req, res) {
 		await User.findOneAndUpdate(
 			{ _id: follower },
 			{
-				$pull: { following: userToUnfollow }
+				$pull: { following: userToUnfollow },
 			}
 		);
 
 		res.status(200).json({
-			message: "Unfollowed the user"
+			message: "Unfollowed the user",
 		});
 	} catch (err) {
 		res.json({
-			error: err
+			error: err,
 		});
 	}
 }
@@ -542,25 +552,37 @@ function getConnections(req, res) {
 		joinedAt: 1,
 		userImage: 1,
 		following: 1,
-		followers: 1
+		followers: 1,
 	};
 
 	User.findOne({ _id: userId })
 		.select(includeFields)
-		.populate("followers", { username: 1, email: 1, joinedAt: 1, userImage: 1, fullname: 1 })
-		.populate("following", { username: 1, email: 1, joinedAt: 1, userImage: 1, fullname: 1 })
+		.populate("followers", {
+			username: 1,
+			email: 1,
+			joinedAt: 1,
+			userImage: 1,
+			fullname: 1,
+		})
+		.populate("following", {
+			username: 1,
+			email: 1,
+			joinedAt: 1,
+			userImage: 1,
+			fullname: 1,
+		})
 		.then((user) => {
 			res.status(200).json({
 				message: "User with followers and following data",
-				user
+				user,
 			});
 		})
 		.catch((err) => {
 			res.status(400).json({
 				message: "Request Failed",
 				errors: {
-					error: err
-				}
+					error: err,
+				},
 			});
 		});
 }
@@ -576,5 +598,5 @@ module.exports = {
 	getSavedFictions,
 	followUser,
 	unfollowUser,
-	getConnections
+	getConnections,
 };

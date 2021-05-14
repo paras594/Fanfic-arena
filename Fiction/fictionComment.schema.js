@@ -4,12 +4,12 @@ const Schema = mongoose.Schema;
 const FictionCommentSchema = new Schema({
 	userId: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: "User",
+		ref: "users",
 		required: true,
 	},
 	fictionId: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: "Fiction",
+		ref: "fictions",
 		required: true,
 	},
 	body: {

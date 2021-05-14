@@ -24,19 +24,19 @@ const userSchema = new Schema({
 	fictions: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Fiction",
+			ref: "fictions",
 		},
 	],
 	likedFictions: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Fiction",
+			ref: "fictions",
 		},
 	],
 	savedFictions: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Fiction",
+			ref: "fictions",
 		},
 	],
 	joinedAt: {
@@ -46,13 +46,13 @@ const userSchema = new Schema({
 	followers: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
+			ref: "users",
 		},
 	],
 	following: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
+			ref: "users",
 		},
 	],
 	favouriteCategories: [String],

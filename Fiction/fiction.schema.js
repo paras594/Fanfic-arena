@@ -6,7 +6,7 @@ const FictionComment = require("./fictionComment.schema.js");
 const FictionSchema = new Schema({
 	userId: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: "User",
+		ref: "users",
 		required: true,
 	},
 	title: {
@@ -40,7 +40,7 @@ const FictionSchema = new Schema({
 	likes: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "User",
+			ref: "users",
 		},
 	],
 	commentsCount: {
@@ -50,7 +50,7 @@ const FictionSchema = new Schema({
 	comments: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "FictionComment",
+			ref: "fictioncomments",
 		},
 	],
 });

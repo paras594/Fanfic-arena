@@ -8,19 +8,19 @@ const User = require("./user.schema.js");
 const mongoose = require("mongoose");
 
 // route: /api/users/
-router.get("/paras", (req, res) => {
-	res.json({
-		state: mongoose.connection.readyState,
-	});
+// router.get("/paras", (req, res) => {
+// 	res.json({
+// 		state: mongoose.connection.readyState,
+// 	});
 
-	// User.find({})
-	// 	.then((results) => {
-	// 		res.json({ users: results });
-	// 	})
-	// 	.catch((err) => {
-	// 		res.json({ error: err });
-	// 	});
-});
+// 	// User.find({})
+// 	// 	.then((results) => {
+// 	// 		res.json({ users: results });
+// 	// 	})
+// 	// 	.catch((err) => {
+// 	// 		res.json({ error: err });
+// 	// 	});
+// });
 
 router.post("/register", userController.registerUser);
 router.post("/login", userController.loginUser);
