@@ -41,18 +41,21 @@ function LoginPage() {
 					payload: decoded,
 				});
 
+				console.log({ decoded });
+
 				axios
 					.get(`/api/users/${decoded.id}`)
-					.then((res) => {
+					.then((userRes) => {
 						dispatch({
 							type: "SET_USER_DATA",
-							payload: res.data.user,
+							payload: userRes.data.user,
 						});
 
 						history.push("/home");
 					})
 					.catch((err) => {
 						console.log(err);
+						console.log(err.response.data);
 					});
 			})
 			.catch((err) => {
