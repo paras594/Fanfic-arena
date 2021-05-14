@@ -1,5 +1,6 @@
 require("dotenv").config();
 const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
@@ -37,6 +38,14 @@ app.get("/api/test", (req, res) => {
 		name: process.env.NAME,
 		dir: path.resolve(__dirname),
 		test: req.protocol + "://" + req.get("host") + req.originalUrl,
+	});
+});
+
+app.get("/deleteFile", async (req, res) => {
+	await cloudinary.uploader.destroy("qreadrdicbvj59bzndoo");
+
+	res.json({
+		delete: true,
 	});
 });
 

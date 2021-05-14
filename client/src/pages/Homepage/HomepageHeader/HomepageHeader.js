@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import HomepageHeaderContainer from "./HomepageHeaderContainer.jsx";
 import axios from "axios";
+import Loader from "../../../components/Loader/Loader.js";
 
 function HomepageHeader() {
 	const [data, setData] = useState([]);
@@ -32,9 +33,9 @@ function HomepageHeader() {
 		};
 	}, []);
 
-	if (isLoading) return <h1>Loading...</h1>;
+	// if (isLoading) return <h1>Loading...</h1>;
 
-	return <HomepageHeaderContainer data={data} />;
+	return <HomepageHeaderContainer data={data} isLoading={isLoading} />;
 }
 
 export default HomepageHeader;

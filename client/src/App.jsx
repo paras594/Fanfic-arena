@@ -1,5 +1,10 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import {
+	BrowserRouter as Router,
+	Route,
+	Switch,
+	useHistory,
+} from "react-router-dom";
 import { useDispatch } from "react-redux";
 import jwt_decode from "jwt-decode";
 import { ToastContainer } from "react-toastify";
@@ -31,6 +36,7 @@ axios.defaults.baseURL = keys.apiEndpoint;
 
 function App() {
 	const dispatch = useDispatch();
+	const history = useHistory();
 
 	if (localStorage.jwtToken) {
 		const token = localStorage.jwtToken;
@@ -40,12 +46,26 @@ function App() {
 		const decoded = jwt_decode(token);
 
 		dispatch(setCurrentUser(decoded));
-
+		console.log({ history });
 		const currentTime = Date.now() / 1000;
 		if (decoded.exp < currentTime) {
 			dispatch(logoutUser());
 
-			window.location.href = "/login";
+			history.push("/login");
+		} else {
+			axios
+				.get(`/api/users/${decoded.id}`)
+				.then((userRes) => {
+					dispatch({
+						type: "SET_USER_DATA",
+						payload: userRes.data.user,
+					});
+
+					history.push("/home");
+				})
+				.catch((err) => {
+					console.log(err);
+				});
 		}
 	}
 
@@ -57,7 +77,7 @@ function App() {
 	}, []);
 
 	return (
-		<Router>
+		<>
 			<ToastContainer />
 			<GlobalStyles />
 			<Switch>
@@ -118,7 +138,7 @@ function App() {
 					<h1>Unauthorized</h1>
 				</Route>
 			</Switch>
-		</Router>
+		</>
 	);
 }
 

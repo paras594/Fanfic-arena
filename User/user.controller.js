@@ -1,4 +1,4 @@
-const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
 const User = require("./user.schema.js");
 const ResetQuery = require("./resetQueries.schema.js");
 const bcrypt = require("bcryptjs");
@@ -154,7 +154,7 @@ async function forgotPassword(req, res) {
 			from: "Fanfic Arena",
 			to: email,
 			subject: "Reset Your Fanfic Arena Password",
-			text: `To reset your password, click on the following link: http://localhost:3000/reset/${uniqueId}`,
+			text: `To reset your password, click on the following link: https://fanfic-arena.herokuapp.com/reset/${uniqueId}`,
 		});
 
 		console.log(info.response);
@@ -284,19 +284,17 @@ function getUser(req, res) {
 		});
 }
 
-function updateUserProfile(req, res) {
+async function updateUserProfile(req, res) {
 	// req.body = { username, fullname, email }
-	// req.file = { path, destination, fieldname, mimetype...}
+	// req.file = { url, public_id, destination, fieldname, mimetype...}
 	// req.user = { userData }
+
+	console.log({ body: req.body });
 
 	const sanitizedData = sanitize.editProfileInput(req.body);
 	const { errors, isValid } = validate.editProfileInput(sanitizedData);
 
 	if (!isValid) {
-		if (req.file) {
-			fs.unlinkSync(req.file.path);
-		}
-
 		return res.status(400).json({
 			message: "Validation errors",
 			inputs: sanitizedData,
@@ -304,13 +302,24 @@ function updateUserProfile(req, res) {
 		});
 	}
 
+	console.log({ reqUser: req.user });
+
 	let userProfileImg;
+	let userImageId;
+
+	console.log({ reqFile: req.file });
 
 	if (req.file) {
-		console.log({ filename: req.file.filename });
-		userProfileImg = "/uploads/" + req.file.filename;
+		if (req.user.userImageId) {
+			await cloudinary.uploader.destroy(req.user.userImageId);
+		}
+
+		console.log({ url: req.file.url, public_id: req.file.public_id });
+		userProfileImg = req.file.path;
+		userImageId = req.file.filename;
 	} else {
 		userProfileImg = req.user.userImage;
+		userImageId = req.user.userImageId;
 	}
 
 	const updatedUser = req.user;
@@ -318,6 +327,7 @@ function updateUserProfile(req, res) {
 	updatedUser.email = sanitizedData.email;
 	updatedUser.fullname = sanitizedData.fullname;
 	updatedUser.userImage = userProfileImg;
+	updatedUser.userImageId = userImageId;
 
 	User.findOneAndUpdate({ _id: updatedUser._id }, updatedUser, { new: true })
 		.then((user) => {

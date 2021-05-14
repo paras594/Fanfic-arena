@@ -14,14 +14,14 @@ function EditProfile() {
 	const [profileInputs, setProfileInputs] = useState({
 		username: "",
 		fullname: "",
-		email: ""
+		email: "",
 	});
 	const [file, setFile] = useState(null);
 	const [preview, setPreview] = useState("");
 	const [passwordInputs, setPasswordInputs] = useState({
 		currentPassword: "",
 		newPassword: "",
-		newPassword2: ""
+		newPassword2: "",
 	});
 	const [errors, setErrors] = useState({
 		username: "",
@@ -29,7 +29,7 @@ function EditProfile() {
 		email: "",
 		currentPassword: "",
 		newPassword: "",
-		newPassword2: ""
+		newPassword2: "",
 	});
 
 	useEffect(() => {
@@ -43,23 +43,27 @@ function EditProfile() {
 		setProfileInputs({
 			username: user.username,
 			fullname: user.fullname,
-			email: user.email
+			email: user.email,
 		});
 
 		setPreview(user.userImage);
 	}, [user.username, user.fullname, user.email, user.userImage]);
 
 	const handleChooseImg = (e) => {
-		let selectedFile = e.target.files[0];
-		let previewImage = URL.createObjectURL(selectedFile);
-		setFile(selectedFile);
-		setPreview(previewImage);
+		try {
+			let selectedFile = e.target.files[0];
+			let previewImage = URL.createObjectURL(selectedFile);
+			setFile(selectedFile);
+			setPreview(previewImage);
+		} catch (err) {
+			console.log({ error: err });
+		}
 	};
 
 	const handleProfileInputChange = (e) => {
 		setProfileInputs({
 			...profileInputs,
-			[e.target.name]: e.target.value
+			[e.target.name]: e.target.value,
 		});
 	};
 
@@ -80,13 +84,13 @@ function EditProfile() {
 				console.log(res.data);
 				dispatch({
 					type: "SET_USER_DATA",
-					payload: res.data.user
+					payload: res.data.user,
 				});
 
 				setPasswordInputs({
 					currentPassword: "",
 					newPassword: "",
-					newPassword2: ""
+					newPassword2: "",
 				});
 				setErrors({
 					username: "",
@@ -94,7 +98,7 @@ function EditProfile() {
 					email: "",
 					currentPassword: "",
 					newPassword: "",
-					newPassword2: ""
+					newPassword2: "",
 				});
 				toast.success("Profile Updated Successfully.");
 			})
@@ -108,7 +112,7 @@ function EditProfile() {
 					currentPassword: "",
 					newPassword: "",
 					newPassword2: "",
-					...data.errors
+					...data.errors,
 				});
 			});
 	};
@@ -116,7 +120,7 @@ function EditProfile() {
 	const handlePasswordInputChange = (e) => {
 		setPasswordInputs({
 			...passwordInputs,
-			[e.target.name]: e.target.value
+			[e.target.name]: e.target.value,
 		});
 	};
 
@@ -131,7 +135,7 @@ function EditProfile() {
 					currentPassword: "",
 					newPassword: "",
 					newPassword2: "",
-					...res.data.inputs
+					...res.data.inputs,
 				});
 				setErrors({
 					username: "",
@@ -139,7 +143,7 @@ function EditProfile() {
 					email: "",
 					currentPassword: "",
 					newPassword: "",
-					newPassword2: ""
+					newPassword2: "",
 				});
 				toast.success("Profile Updated Successfully.");
 			})
@@ -153,7 +157,7 @@ function EditProfile() {
 					currentPassword: "",
 					newPassword: "",
 					newPassword2: "",
-					...data.errors
+					...data.errors,
 				});
 			});
 	};

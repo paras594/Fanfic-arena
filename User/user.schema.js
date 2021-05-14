@@ -19,8 +19,10 @@ const userSchema = new Schema({
 	},
 	userImage: {
 		type: String,
-		default: "/images/default-profile-image.png",
+		default:
+			"https://res.cloudinary.com/dzujgoodl/image/upload/v1620985191/default-profile-image_gy7rls.png",
 	},
+	userImageId: String,
 	fictions: [
 		{
 			type: mongoose.Schema.Types.ObjectId,

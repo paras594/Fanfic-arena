@@ -19,7 +19,8 @@ const FictionSchema = new Schema({
 	},
 	image: {
 		type: String,
-		default: "/images/default-fiction-image.svg",
+		default:
+			"https://res.cloudinary.com/dzujgoodl/image/upload/v1620985190/default-fiction-image_saf2v8.svg",
 	},
 	createdAt: {
 		type: Date,
