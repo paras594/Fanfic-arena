@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const cloudinary = require("cloudinary").v2;
 const User = require("../User/user.schema.js");
 const Fiction = require("./fiction.schema.js");
 const FictionComment = require("./fictionComment.schema.js");
@@ -16,23 +17,19 @@ function createFiction(req, res) {
 
 	if (!isValid) {
 		// delete file if input is invalid
-		if (req.file) {
-			fs.unlinkSync(req.file.path);
-		}
-
 		return res.status(400).json({
 			message: "Validation errors",
 			inputs: sanitizedData,
-			errors
+			errors,
 		});
 	}
 
 	let fictionImage;
+	let fictionImageId;
 
 	if (req.file) {
-		fictionImage = "/uploads/" + req.file.filename;
-	} else {
-		fictionImage = "/images/default-fiction-image.svg";
+		fictionImage = req.file.path;
+		fictionImageId = req.file.filename;
 	}
 
 	// create fiction and save it
@@ -41,8 +38,9 @@ function createFiction(req, res) {
 		title: sanitizedData.title,
 		description: sanitizedData.description,
 		image: fictionImage,
+		imageId: fictionImageId,
 		category: sanitizedData.category,
-		body: sanitizedData.body
+		body: sanitizedData.body,
 	});
 
 	newFiction
@@ -51,10 +49,14 @@ function createFiction(req, res) {
 			let userFictions = req.user.fictions;
 			userFictions.push(newFiction._id);
 
-			User.findOneAndUpdate({ _id: req.user._id }, { fictions: userFictions }, { new: true })
+			User.findOneAndUpdate(
+				{ _id: req.user._id },
+				{ fictions: userFictions },
+				{ new: true }
+			)
 				.then((user) => {
 					res.status(201).json({
-						message: "Fiction Created"
+						message: "Fiction Created",
 					});
 				})
 				.catch((err) => {
@@ -62,8 +64,8 @@ function createFiction(req, res) {
 					res.status(500).json({
 						message: "Server Error",
 						errors: {
-							error: "Failed to add fiction in user"
-						}
+							error: "Failed to add fiction in user",
+						},
 					});
 				});
 		})
@@ -72,8 +74,8 @@ function createFiction(req, res) {
 			return res.status(500).json({
 				message: "Server error",
 				errors: {
-					error: "Failed to create fiction"
-				}
+					error: "Failed to create fiction",
+				},
 			});
 		});
 }
@@ -86,19 +88,25 @@ function getFictions(req, res) {
 	Fiction.find({})
 		.sort(sortQuery)
 		.limit(limitQuery)
-		.populate("userId", { _id: 1, username: 1, fullname: 1, email: 1, userImage: 1 })
+		.populate("userId", {
+			_id: 1,
+			username: 1,
+			fullname: 1,
+			email: 1,
+			userImage: 1,
+		})
 		.then((fictions) => {
 			return res.status(200).json({
 				message: "Fictions data",
-				fictions
+				fictions,
 			});
 		})
 		.catch((err) => {
 			return res.status(400).json({
 				message: "Request failed",
 				errors: {
-					error: err
-				}
+					error: err,
+				},
 			});
 		});
 }
@@ -110,7 +118,7 @@ function getOneFiction(req, res) {
 		username: 1,
 		fullname: 1,
 		email: 1,
-		userImage: 1
+		userImage: 1,
 	};
 
 	Fiction.findOne({ _id: fictionId })
@@ -119,21 +127,21 @@ function getOneFiction(req, res) {
 			path: "comments",
 			populate: {
 				path: "userId",
-				select: userFields
-			}
+				select: userFields,
+			},
 		})
 		.then((fiction) => {
 			res.status(200).json({
 				message: "Fiction data",
-				fiction
+				fiction,
 			});
 		})
 		.catch((err) => {
 			res.status(400).json({
 				message: "Request failed.",
 				errors: {
-					error: err
-				}
+					error: err,
+				},
 			});
 		});
 }
@@ -146,7 +154,7 @@ function getFictionByCategory(req, res) {
 		username: 1,
 		fullname: 1,
 		email: 1,
-		userImage: 1
+		userImage: 1,
 	};
 
 	Fiction.find({ category })
@@ -155,7 +163,7 @@ function getFictionByCategory(req, res) {
 		.then((fictions) => {
 			res.status(200).json({
 				message: `${category} related fictions`,
-				fictions
+				fictions,
 			});
 		})
 		.catch((err) => {
@@ -163,8 +171,8 @@ function getFictionByCategory(req, res) {
 			res.status(400).json({
 				message: "Request failed",
 				errors: {
-					error: err
-				}
+					error: err,
+				},
 			});
 		});
 }
@@ -176,8 +184,8 @@ async function getSearchResults(req, res) {
 		return res.status(400).json({
 			message: "No query",
 			errors: {
-				error: "Pass search query with request"
-			}
+				error: "Pass search query with request",
+			},
 		});
 	}
 
@@ -187,7 +195,7 @@ async function getSearchResults(req, res) {
 	if (!isValid) {
 		return res.status(400).json({
 			message: "Bad request",
-			errors
+			errors,
 		});
 	}
 
@@ -198,7 +206,7 @@ async function getSearchResults(req, res) {
 			username: 1,
 			fullname: 1,
 			email: 1,
-			userImage: 1
+			userImage: 1,
 		};
 		const results = await Fiction.fuzzySearch(sanitizedQuery)
 			.select({ body: 0 })
@@ -206,14 +214,14 @@ async function getSearchResults(req, res) {
 
 		res.status(200).json({
 			message: `Search results for ${q}`,
-			results
+			results,
 		});
 	} catch (err) {
 		res.status(400).json({
 			message: "Search failed",
 			errors: {
-				error: err
-			}
+				error: err,
+			},
 		});
 	}
 }
@@ -228,20 +236,20 @@ function likeFiction(req, res) {
 		{ _id: fictionId },
 		{
 			$push: { likes: userId },
-			$inc: { likesCount: 1 }
+			$inc: { likesCount: 1 },
 		},
 		{ new: true }
 	).then((fiction) => {
 		User.findOneAndUpdate(
 			{ _id: userId },
 			{
-				$push: { likedFictions: fictionId }
+				$push: { likedFictions: fictionId },
 			},
 			{ new: true }
 		).then((user) => {
 			return res.status(200).json({
 				message: "Liked fiction successfully",
-				fiction
+				fiction,
 			});
 		});
 	});
@@ -257,20 +265,20 @@ function unlikeFiction(req, res) {
 		{ _id: fictionId },
 		{
 			$pull: { likes: userId },
-			$inc: { likesCount: -1 }
+			$inc: { likesCount: -1 },
 		},
 		{ new: true }
 	).then((fiction) => {
 		User.findOneAndUpdate(
 			{ _id: userId },
 			{
-				$pull: { likedFictions: fictionId }
+				$pull: { likedFictions: fictionId },
 			},
 			{ new: true }
 		).then((user) => {
 			return res.status(200).json({
 				message: "Unliked fiction successfully",
-				fiction
+				fiction,
 			});
 		});
 	});
@@ -288,7 +296,7 @@ function addComment(req, res) {
 		return res.status(400).json({
 			message: "Validation errors",
 			inputs: sanitizedData,
-			errors
+			errors,
 		});
 	}
 
@@ -299,7 +307,7 @@ function addComment(req, res) {
 	const newComment = new FictionComment({
 		userId,
 		fictionId,
-		body
+		body,
 	});
 
 	newComment.save().then((ficCom) => {
@@ -307,17 +315,17 @@ function addComment(req, res) {
 			{ _id: fictionId },
 			{
 				$push: { comments: newComment._id },
-				$inc: { commentsCount: 1 }
+				$inc: { commentsCount: 1 },
 			},
 			{ new: true }
 		).then((fic) => {
 			FictionComment.populate(newComment, {
 				path: "userId",
-				select: "_id username fullname email"
+				select: "_id username fullname email",
 			}).then((comment) => {
 				res.status(201).json({
 					message: "Comment added",
-					comment
+					comment,
 				});
 			});
 		});
@@ -333,22 +341,22 @@ function saveFiction(req, res) {
 	User.findOneAndUpdate(
 		{ _id: userId },
 		{
-			$push: { savedFictions: fictionId }
+			$push: { savedFictions: fictionId },
 		},
 		{ new: true }
 	)
 		.then((newFic) => {
 			console.log("saved");
 			res.status(200).json({
-				message: "Saved fiction"
+				message: "Saved fiction",
 			});
 		})
 		.catch((err) => {
 			res.json({
 				message: "Error occured. Failed to save",
 				errors: {
-					error: err
-				}
+					error: err,
+				},
 			});
 		});
 }
@@ -363,22 +371,22 @@ function unsaveFiction(req, res) {
 	User.findOneAndUpdate(
 		{ _id: userId },
 		{
-			$pull: { savedFictions: fictionId }
+			$pull: { savedFictions: fictionId },
 		},
 		{ new: true }
 	)
 		.then((newFic) => {
 			console.log("unsaved");
 			res.status(200).json({
-				message: "Removed fiction from saved fictions"
+				message: "Removed fiction from saved fictions",
 			});
 		})
 		.catch((err) => {
 			res.json({
 				message: "Error occured. Failed to remove from saved fictions",
 				errors: {
-					error: err
-				}
+					error: err,
+				},
 			});
 		});
 }
@@ -395,20 +403,20 @@ function deleteFiction(req, res) {
 			User.findOneAndUpdate(
 				{ _id: userId },
 				{
-					$pull: { fictions: fictionId }
+					$pull: { fictions: fictionId },
 				}
 			)
 				.then(() => {
 					res.status(200).json({
-						message: "Fiction Deleted Successfully"
+						message: "Fiction Deleted Successfully",
 					});
 				})
 				.catch((err) => {
 					res.status(500).json({
 						message: "Error occurred. Failed to delete fiction.",
 						errors: {
-							error: err
-						}
+							error: err,
+						},
 					});
 				});
 		})
@@ -416,15 +424,15 @@ function deleteFiction(req, res) {
 			res.status(500).json({
 				message: "Error occurred. Failed to delete fiction.",
 				errors: {
-					error: err
-				}
+					error: err,
+				},
 			});
 		});
 }
 
-function updateFiction(req, res) {
+async function updateFiction(req, res) {
 	// req.body { title, description, category, body }
-	// req.file { path, destination, fieldname, mimetype...}
+	// req.file { path, filename, destination, fieldname, mimetype...}
 	// req.user { username, _id }
 	// req.params { fictionId }
 
@@ -433,54 +441,57 @@ function updateFiction(req, res) {
 
 	if (!isValid) {
 		// delete file if input is invalid
-		if (req.body.imageChanged && req.file) {
-			fs.unlinkSync(req.file.path);
-		}
-
 		return res.status(400).json({
 			message: "Validation errors",
 			inputs: sanitizedData,
-			errors
+			errors,
 		});
 	}
 
 	const { fictionId } = req.params;
+	const fiction = await Fiction.findOne({ _id: fictionId });
 
 	const updatedFic = {
 		title: sanitizedData.title,
 		description: sanitizedData.description,
 		category: sanitizedData.category,
-		body: sanitizedData.body
+		body: sanitizedData.body,
 	};
 
 	// this check is required so that previous image is preserved
 	// becoz req.body.imageChanged is a string, it is better to check like this
 	let imageChanged = req.body.imageChanged === "true";
 	let fictionImage;
+	let fictionImageId;
 
 	if (imageChanged) {
 		console.log("i m here to change image");
 		if (req.file) {
-			fictionImage = "/uploads/" + req.file.filename;
+			await cloudinary.uploader.destroy(fiction.imageId);
+
+			fictionImage = req.file.path;
+			fictionImageId = req.file.filename;
 		} else {
-			fictionImage = "/images/default-fiction-image.svg";
+			fictionImage = fiction.image;
+			fictionImageId = fiction.imageId;
 		}
 
 		updatedFic.image = fictionImage;
+		updatedFic.imageId = fictionImageId;
 	}
 
 	Fiction.findOneAndUpdate({ _id: fictionId }, updatedFic)
 		.then(() => {
 			res.status(200).json({
-				message: "Fiction updated"
+				message: "Fiction updated",
 			});
 		})
 		.catch((err) => {
 			res.status(400).json({
 				message: "Failed to update fiction",
 				errors: {
-					error: err
-				}
+					error: err,
+				},
 			});
 		});
 }
@@ -497,5 +508,5 @@ module.exports = {
 	saveFiction,
 	unsaveFiction,
 	deleteFiction,
-	updateFiction
+	updateFiction,
 };
