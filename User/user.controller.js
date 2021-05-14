@@ -307,6 +307,7 @@ function updateUserProfile(req, res) {
 	let userProfileImg;
 
 	if (req.file) {
+		console.log({ filename: req.file.filename });
 		userProfileImg = "/uploads/" + req.file.filename;
 	} else {
 		userProfileImg = req.user.userImage;
