@@ -50,6 +50,9 @@ function LoginPageContainer({
 					Register Here
 				</A>
 			</SwitchFormsText>
+			<div style={{ textAlign: "center", marginTop: "2.8rem" }}>
+				<A to="/">Go To Home</A>
+			</div>
 		</FormPage>
 	);
 }
