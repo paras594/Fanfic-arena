@@ -46,7 +46,7 @@ export const NavToggleMenu = styled.div`
 	background: ${colors.navBg};
 	width: 100%;
 	padding: 0 2rem;
-	height: ${(props) => (props.open ? (props.big ? "14rem" : "11rem") : 0)};
+	height: ${(props) => (props.open ? (props.big ? "17rem" : "11rem") : 0)};
 	overflow: hidden;
 	transition: all 0.2s linear;
 

@@ -59,8 +59,22 @@ function NavbarContainer({ isAuth, user }) {
 					<Link to={isAuth ? "/home" : "/"}>Home</Link>
 					<Link to="/categories">Categories</Link>
 					{isAuth && <Link to={`/profile/${user._id}`}>My Fictions</Link>}
-					<NavButton onClick={handleLoginClick}>Login</NavButton>
-					<NavButton onClick={handleRegisterClick}>Register</NavButton>
+					{isAuth ? (
+						<>
+							<Link to={`/profile/${user._id}`}>Profile</Link>
+							<NavButton onClick={handleWriteFiction}>
+								Write Fiction
+							</NavButton>
+							<NavButton onClick={handleLogout}>Logout</NavButton>
+						</>
+					) : (
+						<>
+							<NavButton onClick={handleLoginClick}>Login</NavButton>
+							<NavButton onClick={handleRegisterClick}>
+								Register
+							</NavButton>
+						</>
+					)}
 				</NavToggleMenu>
 				<LogoContainer fontSize="1rem" goTo={isAuth ? "/home" : "/"} />
 				<NavLinks>

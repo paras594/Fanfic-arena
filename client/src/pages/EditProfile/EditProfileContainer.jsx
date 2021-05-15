@@ -18,7 +18,7 @@ function EditProfileContainer({
 	handleProfileSubmit,
 	passwordInputs,
 	handlePasswordInputChange,
-	handlePasswordSubmit
+	handlePasswordSubmit,
 }) {
 	const [activeTab, setActiveTab] = useState(1);
 
@@ -36,7 +36,11 @@ function EditProfileContainer({
 					<Div>
 						<ProfileImgContainer src={preview} />
 						<UploadBtn>
-							<input type="file" onChange={handleChooseImg} ref={profileImageRef} />
+							<input
+								type="file"
+								onChange={handleChooseImg}
+								ref={profileImageRef}
+							/>
 							<Button>Choose Image</Button>
 						</UploadBtn>
 						<Form my="1.4rem" onSubmit={handleProfileSubmit}>
@@ -48,7 +52,11 @@ function EditProfileContainer({
 									value={profileInputs.username}
 									onChange={handleProfileInputChange}
 								/>
-								{errors.username ? <InputError>{errors.username}</InputError> : ""}
+								{errors.username ? (
+									<InputError>{errors.username}</InputError>
+								) : (
+									""
+								)}
 							</InputGroup>
 							<InputGroup>
 								<Input
@@ -58,7 +66,11 @@ function EditProfileContainer({
 									value={profileInputs.fullname}
 									onChange={handleProfileInputChange}
 								/>
-								{errors.fullname ? <InputError>{errors.fullname}</InputError> : ""}
+								{errors.fullname ? (
+									<InputError>{errors.fullname}</InputError>
+								) : (
+									""
+								)}
 							</InputGroup>
 							<InputGroup>
 								<Input
@@ -68,11 +80,14 @@ function EditProfileContainer({
 									value={profileInputs.email}
 									onChange={handleProfileInputChange}
 								/>
-								{errors.email ? <InputError>{errors.email}</InputError> : ""}
+								{errors.email ? (
+									<InputError>{errors.email}</InputError>
+								) : (
+									""
+								)}
 							</InputGroup>
 							<Button type="submit">Update Profile</Button>
 						</Form>
-						<Button invert>Delete Account</Button>
 					</Div>
 				) : (
 					<>
@@ -101,7 +116,11 @@ function EditProfileContainer({
 									value={passwordInputs.newPassword}
 									onChange={handlePasswordInputChange}
 								/>
-								{errors.newPassword ? <InputError>{errors.newPassword}</InputError> : ""}
+								{errors.newPassword ? (
+									<InputError>{errors.newPassword}</InputError>
+								) : (
+									""
+								)}
 							</InputGroup>
 							<InputGroup>
 								<Input
@@ -111,7 +130,11 @@ function EditProfileContainer({
 									value={passwordInputs.newPassword2}
 									onChange={handlePasswordInputChange}
 								/>
-								{errors.newPassword2 ? <InputError>{errors.newPassword2}</InputError> : ""}
+								{errors.newPassword2 ? (
+									<InputError>{errors.newPassword2}</InputError>
+								) : (
+									""
+								)}
 							</InputGroup>
 							<Button>Update Profile</Button>
 						</Form>

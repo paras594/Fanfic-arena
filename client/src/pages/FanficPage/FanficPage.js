@@ -3,6 +3,8 @@ import { useParams, useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 import FanficPageContainer from "./FanficPageContainer.jsx";
 import axios from "axios";
+import { toast } from "react-toastify";
+import Loader from "../../components/Loader/Loader";
 
 function FanficPage() {
 	const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -31,6 +33,9 @@ function FanficPage() {
 
 	const handleDeleteClick = (e) => {
 		console.log("deleting...");
+		if (!isAuthenticated) {
+			return toast.info("Login Required !");
+		}
 		axios
 			.delete(`/api/fictions/${fictionId}`)
 			.then((res) => {
@@ -43,16 +48,25 @@ function FanficPage() {
 	};
 
 	const handleEditClick = (e) => {
+		if (!isAuthenticated) {
+			return toast.info("Login Required !");
+		}
 		history.push(`/fiction/${fictionId}/edit`);
 	};
 
 	const handleSaveClick = (e) => {
+		if (!isAuthenticated) {
+			return toast.info("Login Required !");
+		}
 		axios.post(`/api/fictions/${fictionId}/save`).then((res) => {
 			setSaved(true);
 		});
 	};
 
 	const handleUnsaveClick = (e) => {
+		if (!isAuthenticated) {
+			return toast.info("Login Required !");
+		}
 		axios.post(`/api/fictions/${fictionId}/unsave`).then((res) => {
 			setSaved(false);
 		});
@@ -68,7 +82,7 @@ function FanficPage() {
 			handleUnsaveClick={handleUnsaveClick}
 		/>
 	) : (
-		""
+		<Loader />
 	);
 }
 

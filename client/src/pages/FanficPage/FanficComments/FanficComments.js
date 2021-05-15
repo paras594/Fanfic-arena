@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import produce from "immer";
+import { toast } from "react-toastify";
 import axios from "axios";
 import FanficCommentsContainer from "./FanficCommentsContainer.jsx";
+import { useSelector } from "react-redux";
 
 function FanficComments({ comments, fictionId }) {
+	const { isAuthenticated } = useSelector((state) => state.auth);
 	const [fictionComments, setFictionsComments] = useState(comments);
 	const [comment, setComment] = useState("");
 
@@ -14,6 +17,10 @@ function FanficComments({ comments, fictionId }) {
 	const handleCommentSubmit = (e) => {
 		e.preventDefault();
 		console.log("form submitted");
+
+		if (!isAuthenticated) {
+			return toast.info("Login Required !");
+		}
 
 		axios
 			.post(`/api/fictions/${fictionId}/comment`, { comment })

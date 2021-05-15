@@ -2,8 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import ProfilePageContainer from "./ProfilePageContainer.jsx";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 function ProfilePage() {
+	const { isAuthenticated } = useSelector((state) => state.auth);
 	const [userData, setUserData] = useState({
 		id: null,
 		username: "",
@@ -48,6 +51,9 @@ function ProfilePage() {
 	}, [userId]);
 
 	const handleFollowClick = (e) => {
+		if (!isAuthenticated) {
+			return toast.info("Login Required !");
+		}
 		axios
 			.post(`/api/users/${userId}/follow`)
 			.then((res) => {
@@ -60,6 +66,9 @@ function ProfilePage() {
 	};
 
 	const handleUnfollowClick = (e) => {
+		if (!isAuthenticated) {
+			return toast.info("Login Required !");
+		}
 		axios
 			.post(`/api/users/${userId}/unfollow`)
 			.then((res) => {
@@ -72,6 +81,9 @@ function ProfilePage() {
 	};
 
 	const handleEditProfile = () => {
+		if (!isAuthenticated) {
+			return toast.info("Login Required !");
+		}
 		console.log("handling edit profile click");
 		history.push(`/profile/${userId}/edit`);
 	};

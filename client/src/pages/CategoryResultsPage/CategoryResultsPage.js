@@ -5,10 +5,12 @@ import CategoryResultsContainer from "./CategoryResultsContainer.jsx";
 
 function CategoryResultsPage() {
 	const [results, setResults] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
 	const params = useParams();
 	const { category } = params;
 
 	useEffect(() => {
+		setIsLoading(true);
 		let url = `/api/fictions/categories/${category}`;
 
 		if (category === "Popular Fictions") {
@@ -27,10 +29,13 @@ function CategoryResultsPage() {
 			})
 			.catch((err) => {
 				console.log(err.response.data);
+			})
+			.finally(() => {
+				setIsLoading(false);
 			});
 	}, [category]);
 
-	return <CategoryResultsContainer results={results} />;
+	return <CategoryResultsContainer results={results} isLoading={isLoading} />;
 }
 
 export default CategoryResultsPage;

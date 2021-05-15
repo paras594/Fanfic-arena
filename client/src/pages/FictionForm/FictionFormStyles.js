@@ -23,6 +23,11 @@ export const ChooseImg = styled.div`
 export const FictionDetails = styled.div`
 	display: flex;
 	margin-bottom: 2rem;
+
+	@media (max-width: 700px) {
+		flex-direction: column;
+		margin-bottom: 1rem;
+	}
 `;
 
 export const FictionInputs = styled.div`
@@ -31,13 +36,24 @@ export const FictionInputs = styled.div`
 	flex-direction: column;
 	margin-left: 1rem;
 
+	@media (max-width: 700px) {
+		margin-left: 0;
+		margin-top: 2.4rem;
+	}
+
 	.inputs {
 		width: 100%;
 		display: flex;
 		margin-bottom: 0.5rem;
 
+		@media (max-width: 430px) {
+			margin-bottom: 1rem;
+			flex-direction: column-reverse;
+		}
+
 		input {
 			flex: 1;
+			width: 100%;
 		}
 	}
 
@@ -56,6 +72,10 @@ export const FictionInputs = styled.div`
 			border-radius: 0.3rem;
 			color: ${colors.inputText};
 
+			@media (max-width: 700px) {
+				height: 6rem;
+			}
+
 			&:active,
 			&:focus {
 				border: 0.1rem solid ${colors.inputBorderActive};
@@ -71,8 +91,10 @@ export const FictionInputs = styled.div`
 `;
 
 export const SelectBtn = styled.select`
-	color: ${(props) => (props.invert ? colors.btnTextLight : colors.btnTextDark)};
-	background: ${(props) => (props.invert ? colors.btnBgDark : colors.btnBgLight)};
+	color: ${(props) =>
+		props.invert ? colors.btnTextLight : colors.btnTextDark};
+	background: ${(props) =>
+		props.invert ? colors.btnBgDark : colors.btnBgLight};
 	font-size: 0.9rem;
 	font-family: ${primaryFont};
 	font-weight: ${(props) => (props.bold ? 600 : 500)};
@@ -84,6 +106,11 @@ export const SelectBtn = styled.select`
 	padding-left: ${(props) => props.px || "1rem"};
 	margin-left: 0.5rem;
 	cursor: pointer;
+
+	@media (max-width: 430px) {
+		margin-left: 0;
+		margin-bottom: 1rem;
+	}
 
 	option {
 		background: #fff;
